@@ -1,6 +1,8 @@
 FROM openjdk:8-jdk
 
-RUN apt-get update && apt-get install -y git curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+  && apt-get install -y git curl zip unzip sudo \
+  && rm -rf /var/lib/apt/lists/*
 
 ARG user=jenkins
 ARG group=jenkins
@@ -19,7 +21,8 @@ ENV JENKINS_SLAVE_AGENT_PORT ${agent_port}
 RUN mkdir -p $JENKINS_HOME \
   && chown ${uid}:${gid} $JENKINS_HOME \
   && groupadd -g ${gid} ${group} \
-  && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -m -s /bin/bash ${user}
+  && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -m -s /bin/bash ${user} \
+  && echo "${user} ALL=NOPASSWD: ALL" >> /etc/sudoers
 
 # Jenkins home directory is a volume, so configuration and build history
 # can be persisted and survive image upgrades
